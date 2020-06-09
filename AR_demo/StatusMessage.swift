@@ -16,7 +16,7 @@ A label to present the user with feedback.
 import UIKit
 
 @IBDesignable
-class MessageLabel: UILabel {
+class StatusMessage: UILabel {
     
     var ignoreMessages = false
         

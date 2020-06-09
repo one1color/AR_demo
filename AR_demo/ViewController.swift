@@ -13,6 +13,7 @@ import MultipeerSession
 class ViewController: UIViewController {
     
     @IBOutlet var arView: ARView!
+    @IBOutlet weak var statusMessage: StatusMessage!
     
     var multipeerSession: MultipeerSession?
     var sessionIDObservation: NSKeyValueObservation?
@@ -28,6 +29,9 @@ class ViewController: UIViewController {
         
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(onTap(recognizer:)))
         arView.addGestureRecognizer(tapGestureRecognizer)
+        
+        //statusMessage.displayMessage("hello world")
+        statusMessage.displayMessage("Well done! Connected with another User, Let's get started to share AR experience!")
     }
     
     func setupARView() {
@@ -57,6 +61,7 @@ class ViewController: UIViewController {
         
     }
     
+    
     @objc func onTap(recognizer: UITapGestureRecognizer) {
         let location = recognizer.location(in: arView)
         
@@ -65,6 +70,8 @@ class ViewController: UIViewController {
         if let firstResult = results.first{
             let anchor = ARAnchor(name: "LaserRed", transform: firstResult.worldTransform)
             arView.session.add(anchor: anchor)
+        } else {
+            
         }
 
     }
@@ -88,6 +95,7 @@ extension ViewController: ARSessionDelegate {
             
             if let participantAnchor = anchor as? ARParticipantAnchor {
                 print("connected with another User! let's share the AR space")
+                statusMessage.displayMessage("Well done! Connected with another User, Let's get started to share AR experience!")
                 
                 let anchorEntity = AnchorEntity(anchor: participantAnchor)
                 
@@ -128,8 +136,6 @@ extension ViewController {
         if let commandString = String(data: data, encoding: .utf8), commandString.starts(with: sessionIDCommandString) {
             let newSessionID = String(commandString[commandString.index(commandString.startIndex, offsetBy: sessionIDCommandString.count)...])
             
-            // If this peer was using a different session ID before, remove all its assosiated anchors.
-            // This will remove the old participant anchor and its geometry from the scene.
             if let oldSessionID = multipeerSession.peerSessionIDs[peer] {
                 removeAllAnchorsOriginatingFromARSessionWithID(oldSessionID)
             }
@@ -138,7 +144,7 @@ extension ViewController {
         }
     }
     
-    // 5.7
+
     func peerDiscovered(_ peer: PeerID) -> Bool {
         guard let multipeerSession = multipeerSession else { return false }
         
@@ -151,7 +157,6 @@ extension ViewController {
         }
     }
     
-    // - Tag: PeerJoined
     func peerJoined(_ peer: PeerID) {
         print("""
             A player wants to join the game.
