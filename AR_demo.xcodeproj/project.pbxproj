@@ -107,10 +107,10 @@
 				E711A2E3248EFCAB009F3DF0 /* ViewController.swift */,
 				E711A2E5248EFCAB009F3DF0 /* Experience.rcproject */,
 				E711A2E7248EFCAB009F3DF0 /* Main.storyboard */,
+				E73FC085248F191600AB8C9C /* StatusMessage.swift */,
 				E711A2EA248EFCAF009F3DF0 /* Assets.xcassets */,
 				E711A2EC248EFCAF009F3DF0 /* LaunchScreen.storyboard */,
 				E711A2EF248EFCAF009F3DF0 /* Info.plist */,
-				E73FC085248F191600AB8C9C /* StatusMessage.swift */,
 			);
 			path = AR_demo;
 			sourceTree = "<group>";
