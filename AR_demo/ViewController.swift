@@ -22,16 +22,13 @@ class ViewController: UIViewController {
         super.viewDidAppear(animated)
         
         setupARView()
-        
         setupMultipeerSession()
         
         arView.session.delegate = self
-        
+
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(onTap(recognizer:)))
         arView.addGestureRecognizer(tapGestureRecognizer)
-        
-        //statusMessage.displayMessage("hello world")
-        statusMessage.displayMessage("Well done! Connected with another User, Let's get started to share AR experience!")
+        statusMessage.displayMessage("Hello! Tap your screen to put ball in AR Space.")
     }
     
     func setupARView() {
@@ -58,34 +55,54 @@ class ViewController: UIViewController {
         
         // Start looking for other players via MultiPeerConnectivity.
         multipeerSession = MultipeerSession(serviceName: "multiuser-ar", receivedDataHandler: self.recievedData, peerJoinedHandler: self.peerJoined, peerLeftHandler: self.peerLeft, peerDiscoveredHandler: self.peerDiscovered)
-        
     }
     
     
     @objc func onTap(recognizer: UITapGestureRecognizer) {
         let location = recognizer.location(in: arView)
         
-        // Attempt to find a 3D location on a horizontal surface underneath the user's touch location.
         let results = arView.raycast(from: location, allowing: .estimatedPlane, alignment: .horizontal)
+        
         if let firstResult = results.first{
-            let anchor = ARAnchor(name: "LaserRed", transform: firstResult.worldTransform)
+            let anchor = ARAnchor(name: "objectPlacement", transform: firstResult.worldTransform)
             arView.session.add(anchor: anchor)
         } else {
-            
+            //error message because it will not detected the horizontal surface
+            statusMessage.displayMessage("Can't place ball! Please try to find surface.")
         }
-
     }
     
-    func createBox(named entityName: String, for anchor: ARAnchor) {
+    func createObject(named entityName: String, for anchor: ARAnchor) {
+        
+//create box
+/*
         let boxLength: Float = 0.05
         let color = UIColor.orange
         let coloredCube = ModelEntity(mesh: MeshResource.generateBox(size: boxLength),
         materials: [SimpleMaterial(color: color, isMetallic: true)])
-        
+
         let anchorEntity = AnchorEntity(anchor: anchor)
         anchorEntity.addChild(coloredCube)
-        arView.scene.addAnchor(anchorEntity)
+ */
 
+//create "Hello" text
+        let textMesh = MeshResource.generateText(
+            "Hello!",
+            extrusionDepth: 0.1,
+            font: .systemFont(ofSize: 1.5),
+            containerFrame: .zero,
+            alignment: .center,
+            lineBreakMode: .byTruncatingTail)
+
+        let textMaterial = SimpleMaterial(color: UIColor.white, roughness: 0.0, isMetallic: true)
+        let textModel = ModelEntity(mesh: textMesh, materials: [textMaterial])
+        textModel.scale = SIMD3<Float>(0.1, 0.1, 0.1)
+        
+        let anchorEntity = AnchorEntity(anchor: anchor)
+        
+        anchorEntity.addChild(textModel)
+        arView.scene.addAnchor(anchorEntity)
+        
     }
 }
 
@@ -99,15 +116,10 @@ extension ViewController: ARSessionDelegate {
                 
                 let anchorEntity = AnchorEntity(anchor: participantAnchor)
                 
-                let mesh = MeshResource.generateSphere(radius: 0.03)
-                let color = UIColor.red
-                let material = SimpleMaterial(color: color, isMetallic: false)
-                let coloredSphere = ModelEntity(mesh: mesh, materials: [material])
-                
-                anchorEntity.addChild(coloredSphere)
                 arView.scene.addAnchor(anchorEntity)
-            }else if let anchorName = anchor.name, anchorName == "LaserRed"{
-                createBox(named: anchorName, for: anchor)
+                
+            }else if let anchorName = anchor.name, anchorName == "objectPlacement"{
+                createObject(named: anchorName, for: anchor)
             }
         }
     }
